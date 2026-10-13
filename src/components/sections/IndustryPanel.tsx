@@ -8,15 +8,22 @@ type IndustryPanelProps = {
 
 export function IndustryPanel({ number, title, description, image, alt }: IndustryPanelProps) {
   return (
-    <article className="industry-panel">
-      <img src={image} alt={alt} width="1280" height="768" loading="lazy" />
-      <div className="industry-panel__shade" />
-      <div className="industry-panel__content">
-        <span>{number}</span>
-        <h3>{title}</h3>
-        <p>{description}</p>
+    <article id={`industry-${number}`} className="industry-card">
+      <div className="industry-card__link">
+        <div className="industry-card__media">
+          <img src={image} alt={alt} loading="lazy" decoding="async" />
+          <span className="industry-card__index" aria-hidden="true">
+            <span>{number}</span><span>/ 06</span>
+          </span>
+        </div>
+        <div className="industry-card__body">
+          <div className="industry-card__title-row">
+            <span className="industry-card__rule" aria-hidden="true" />
+            <h3>{title}</h3>
+          </div>
+          <p>{description}</p>
+        </div>
       </div>
-      <span className="industry-panel__corner" aria-hidden="true" />
     </article>
   );
 }

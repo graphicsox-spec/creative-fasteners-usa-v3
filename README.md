@@ -25,6 +25,8 @@ pnpm preview
 
 The optimized production output is generated in `dist/`. This folder is intentionally excluded from Git.
 
+For a direct browser preview, double-click the root `index.html`. When opened from the filesystem it redirects to the latest generated `dist/index.html`. Running `pnpm build` refreshes both the production bundle and its direct-click compatibility.
+
 ## Project structure
 
 ```text
@@ -33,8 +35,8 @@ creative-fasteners-usa/
 ├─ public/
 │  └─ assets/
 │     ├─ brand/                  Website logos and favicon
-│     ├─ images/industries/      Industry imagery
-│     └─ media/hero/             Hero videos and poster
+│     ├─ images/industries/      Industry card imagery
+│     └─ images/industry-slider-banners/ Five responsive industry slider pairs
 ├─ source-assets/                Local raw/editable assets; excluded from Git
 ├─ src/
 │  ├─ components/
@@ -58,14 +60,9 @@ creative-fasteners-usa/
 
 Keep the filenames unchanged to replace these assets without editing code. Logo usage is in `src/components/layout/Header.tsx` and `src/components/layout/Footer.tsx`.
 
-## Replace hero media
+## Replace hero images
 
-- Slide 1: `public/assets/media/hero/precision-fasteners-featured.mp4`
-- Slide 2: `public/assets/media/hero/precision-fasteners-01.mp4`
-- Slide 3: `public/assets/media/hero/precision-fasteners-02.mp4`
-- Shared poster: `public/assets/media/hero/precision-fasteners-poster.webp`
-
-Use muted, web-optimized MP4 files. Mobile visitors and visitors who prefer reduced motion receive the poster-first experience.
+The five industry slides each have desktop and mobile artwork in `public/assets/images/industry-slider-banners/`. Keep replacement files web-optimized and preserve the filenames to update an image without changing the code.
 
 ## Add or edit hero slides
 
@@ -77,8 +74,9 @@ Edit the `heroSlides` array in `src/content/homepage.ts`. Add one object for eac
   eyebrow: 'SHORT CATEGORY LABEL',
   headline: 'SLIDE HEADLINE',
   description: 'Short supporting message.',
-  video: '/assets/media/hero/your-file.mp4',
-  poster: '/assets/media/hero/your-poster.webp',
+  image: '/assets/images/industry-slider-banners/your-image.jpg',
+  imageAlt: 'A concise description of the image',
+  objectPosition: 'center center',
 }
 ```
 
@@ -96,7 +94,8 @@ The RFQ form currently performs browser-side validation only. It does not claim 
 
 Before launch, connect `handleSubmit` in `src/components/sections/RFQForm.tsx` to an approved secure backend or form service. The integration should include:
 
-- Encrypted submission and file upload
+- Encrypted submission and storage
+- Server-side handling for full name, company, work email, phone, and comments
 - Server-side validation
 - Spam protection
 - Confirmed email or CRM routing

@@ -5,12 +5,15 @@ export type HeroSlide = {
   enabled?: boolean;
   eyebrow: string;
   headline: string;
-  headlineLead?: string;
-  headlineRest?: string;
-  headlineFinal?: string;
   description: string;
-  video: string;
-  poster: string;
+  cta: string;
+  image: string;
+  imageAlt: string;
+  objectPosition?: string;
+  clientArtwork?: {
+    mobileImage: string;
+    headlineLines: [string, string];
+  };
 };
 
 export const navigation = [
@@ -23,42 +26,87 @@ export const navigation = [
   { label: 'Contact', href: '#contact' },
 ];
 
+const sharedHeroHeadline = 'Manufacturing Precision, Made-To-Spec, and Custom Fasteners For A Wide Range of Industries';
+const sharedHeroHeadlineLines: [string, string] = [
+  sharedHeroHeadline,
+  'Aerospace, Military, Oil & Gas, Automotive, and Commercial industries',
+];
+
 const configuredHeroSlides: HeroSlide[] = [
   {
-    id: 'cold-heading',
+    id: 'aerospace',
     enabled: true,
-    eyebrow: 'COLD HEADING • PRECISION FORMING',
-    headline: 'PRECISION FASTENERS. FORMED FOR PERFORMANCE.',
-    headlineLead: 'PRECISION FASTENERS.',
-    headlineRest: 'FORMED FOR PERFORMANCE.',
-    description:
-      'Cold heading capabilities supported by controlled tooling, progressive forming and responsive made-to-spec manufacturing.',
-    video: assetPath('assets/media/hero/Video-01.mp4'),
-    poster: assetPath('assets/media/hero/precision-fasteners-poster.webp'),
+    eyebrow: '',
+    headline: sharedHeroHeadline,
+    description: '',
+    cta: '',
+    image: assetPath('assets/images/industry-slider-banners/aerospace-desktop.jpg'),
+    clientArtwork: {
+      mobileImage: assetPath('assets/images/industry-slider-banners/aerospace-mobile.jpg'),
+      headlineLines: sharedHeroHeadlineLines,
+    },
+    imageAlt: 'A commercial aircraft engine and bolted metal access panel in an aviation maintenance hangar',
+    objectPosition: 'center center',
   },
   {
-    id: 'thread-rolling',
+    id: 'military-defense',
     enabled: true,
-    eyebrow: 'THREAD ROLLING • CONTROLLED THREADING',
-    headline: 'ACCURATE THREADS. CONSISTENT PERFORMANCE.',
-    headlineLead: 'ACCURATE THREADS.',
-    headlineRest: 'CONSISTENT PERFORMANCE.',
-    description:
-      'Precision thread rolling and threading processes engineered for consistent profiles, dimensional accuracy and dependable fit.',
-    video: assetPath('assets/media/hero/Video-02.mp4'),
-    poster: assetPath('assets/media/hero/precision-fasteners-poster.webp'),
+    eyebrow: '',
+    headline: sharedHeroHeadline,
+    description: '',
+    cta: '',
+    image: assetPath('assets/images/industry-slider-banners/military-defense-desktop.jpg'),
+    clientArtwork: {
+      mobileImage: assetPath('assets/images/industry-slider-banners/military-defense-mobile.jpg'),
+      headlineLines: sharedHeroHeadlineLines,
+    },
+    imageAlt: 'An unmarked military utility helicopter with bolted airframe attachment hardware in a maintenance hangar',
+    objectPosition: 'center center',
   },
   {
-    id: 'tooling-dies',
+    id: 'oil-gas',
     enabled: true,
-    eyebrow: 'COLD HEADING DIES • PUNCH DIES • TRIMMING',
-    headline: 'CONTROLLED TOOLING AT EVERY FORMING STAGE.',
-    headlineLead: 'CONTROLLED TOOLING',
-    headlineRest: 'AT EVERY FORMING STAGE.',
-    description:
-      'Cold heading dies, punch dies and trimming operations support repeatable geometry from initial forming through final production.',
-    video: assetPath('assets/media/hero/Video-03.mp4'),
-    poster: assetPath('assets/media/hero/precision-fasteners-poster.webp'),
+    eyebrow: '',
+    headline: sharedHeroHeadline,
+    description: '',
+    cta: '',
+    image: assetPath('assets/images/industry-slider-banners/oil-gas-desktop.jpg'),
+    clientArtwork: {
+      mobileImage: assetPath('assets/images/industry-slider-banners/oil-gas-mobile.jpg'),
+      headlineLines: sharedHeroHeadlineLines,
+    },
+    imageAlt: 'A bolted pipeline valve with stainless steel flanges in an oil and gas refinery',
+    objectPosition: 'center center',
+  },
+  {
+    id: 'automotive',
+    enabled: true,
+    eyebrow: '',
+    headline: sharedHeroHeadline,
+    description: '',
+    cta: '',
+    image: assetPath('assets/images/industry-slider-banners/automotive-desktop.jpg'),
+    clientArtwork: {
+      mobileImage: assetPath('assets/images/industry-slider-banners/automotive-mobile.jpg'),
+      headlineLines: sharedHeroHeadlineLines,
+    },
+    imageAlt: 'Robotic arms assembling a vehicle chassis on a modern automotive production line',
+    objectPosition: 'center center',
+  },
+  {
+    id: 'commercial',
+    enabled: true,
+    eyebrow: '',
+    headline: sharedHeroHeadline,
+    description: '',
+    cta: '',
+    image: assetPath('assets/images/industry-slider-banners/commercial-desktop.jpg'),
+    clientArtwork: {
+      mobileImage: assetPath('assets/images/industry-slider-banners/commercial-mobile.jpg'),
+      headlineLines: sharedHeroHeadlineLines,
+    },
+    imageAlt: 'Industrial pump and bolted pipe connections inside a commercial equipment factory',
+    objectPosition: 'center center',
   },
 ];
 
@@ -67,10 +115,25 @@ export const heroSlides = configuredHeroSlides.filter(
 );
 
 export const trustItems = [
-  'Precision Manufacturing',
-  'Process-Controlled Inspection',
-  'Responsive RFQ Support',
-];
+  {
+    title: 'Precision Manufacturing',
+    detail: 'Drawing-led. Made to specification.',
+    href: '#capabilities',
+    icon: 'manufacturing',
+  },
+  {
+    title: 'Process-Controlled Inspection',
+    detail: 'Dimensions checked along the process.',
+    href: '#quality',
+    icon: 'inspection',
+  },
+  {
+    title: 'Responsive RFQ Support',
+    detail: 'Your requirements. A clear next step.',
+    href: '#rfq',
+    icon: 'support',
+  },
+] as const;
 
 export type CapabilityIcon =
   | 'forming'
@@ -87,56 +150,30 @@ export const capabilities: Array<{
   number: string;
   title: string;
   description: string;
+  highlights: string[];
   icon: CapabilityIcon;
 }> = [
   {
     number: '01',
     title: 'Cold Heading',
-    description:
-      'Progressive cold forming processes that shape solid metal into strong, dimensionally consistent precision fasteners.',
+    description: '',
+    highlights: ['High Volume', 'Tight Tolerances', 'Stronger Components', 'Cost Effective'],
     icon: 'forming',
   },
   {
     number: '02',
-    title: 'Thread Rolling & Threading',
-    description:
-      'Controlled rolling and threading processes that produce accurate thread profiles, consistent pitch and improved material strength.',
+    title: 'Thread Rolling',
+    description: '',
+    highlights: ['Accurate Thread Profiles', 'Consistent Pitch', 'Higher Strength', 'Wide Size Range'],
     icon: 'threading',
   },
   {
     number: '03',
-    title: 'Cold Heading Dies',
+    title: 'Secondary Operations',
     description:
-      'Cold heading die requirements reviewed around fastener geometry, material flow, dimensional accuracy and production repeatability.',
-    icon: 'dies',
-  },
-  {
-    number: '04',
-    title: 'Punch Dies & Tooling',
-    description:
-      'Precision punch dies and forming tooling support accurate head development across successive cold-heading stages.',
-    icon: 'tooling',
-  },
-  {
-    number: '05',
-    title: 'Trimming & Secondary Operations',
-    description:
-      'Controlled trimming removes excess formed material and creates clean, consistent head profiles according to drawing requirements.',
-    icon: 'trimming',
-  },
-  {
-    number: '06',
-    title: 'Heat Treatment & Specialized Finishes',
-    description:
-      'Heat treatment, passivation, plating and specialized finishes coordinated around material, performance and specification requirements.',
+      'We offer a wide range of secondary operations including heat treating, plating, patching, black oxide, and passivation, providing additional processing to meet specific application and performance requirements. Integrated into our manufacturing process, these services help ensure our fasteners meet customer drawings, specifications, and quality standards.',
+    highlights: ['Heat Treating', 'Plating', 'Patching', 'Black Oxide', 'Passivation'],
     icon: 'heat',
-  },
-  {
-    number: '07',
-    title: 'Precision Drilling',
-    description:
-      'Controlled drilling approaches for features where location and dimensional consistency matter.',
-    icon: 'drilling',
   },
 ];
 
@@ -144,22 +181,22 @@ export const qualitySteps = [
   {
     number: '01',
     title: 'Material Verification',
-    description: 'Review incoming material identity and applicable order requirements before production begins.',
+    description: 'Review incoming drawing, material specifications, and applicable order requirements prior to production.',
   },
   {
     number: '02',
     title: 'Process Router Control',
-    description: 'Maintain a clear production path with defined operations and review points.',
+    description: 'Maintain a clearly defined production workflow with established operations, inspection points, material traceability, and thorough documentation throughout every stage of the manufacturing process.',
   },
   {
     number: '03',
     title: 'In-Process Dimensional Inspection',
-    description: 'Check critical dimensions during manufacturing—not only after completion.',
+    description: 'Check critical dimensions throughout the entire manufacturing process.',
   },
   {
     number: '04',
     title: 'Final Quality Review',
-    description: 'Evaluate finished parts against applicable drawing and order requirements.',
+    description: 'Evaluate finished parts against drawing specifications and order requirements.',
   },
   {
     number: '05',
@@ -173,20 +210,41 @@ export const industries = [
     number: '01',
     title: 'Aerospace',
     description: 'Precision fastener requirements for demanding airborne and space-related applications.',
-    image: assetPath('assets/images/industries/aerospace.webp'),
-    alt: 'A technician dimensionally inspecting a precision threaded component',
+    image: assetPath('assets/images/hero-industries/aerospace-client-mobile.jpg'),
+    alt: 'Commercial aircraft engine inside an aviation maintenance hangar',
   },
   {
     number: '02',
     title: 'Defense',
     description: 'Made-to-spec manufacturing support for controlled, mission-focused supply programs.',
-    image: assetPath('assets/images/industries/defense.webp'),
-    alt: 'Organized trays of precision fasteners beside inspection tools',
+    image: assetPath('assets/images/hero-industries/military-defense-client-mobile.jpg'),
+    alt: 'Military utility helicopter inside a maintenance hangar',
   },
   {
     number: '03',
-    title: 'Precision Industrial Manufacturing',
-    description: 'Consistent components for engineered equipment and exacting industrial assemblies.',
+    title: 'Marine',
+    description: 'Precision fastening support for marine equipment, shipboard systems, and demanding assemblies.',
+    image: assetPath('assets/images/industries/defense.webp'),
+    alt: 'Organized trays of precision fasteners for demanding equipment assemblies',
+  },
+  {
+    number: '04',
+    title: 'Oil & Gas',
+    description: 'Components developed for critical energy equipment, infrastructure, and field applications.',
+    image: assetPath('assets/images/hero-industries/oil-gas-client-mobile.jpg'),
+    alt: 'Bolted industrial pipeline valve in an oil and gas refinery',
+  },
+  {
+    number: '05',
+    title: 'Automotive',
+    description: 'Repeatable component manufacturing support for vehicle systems, tooling, and production programs.',
+    image: assetPath('assets/images/hero-industries/law-enforcement-client-mobile.jpg'),
+    alt: 'Robotic production equipment and precision machined components in an industrial facility',
+  },
+  {
+    number: '06',
+    title: 'Custom',
+    description: 'Made-to-spec solutions shaped around unique drawings, materials, tolerances, and end use.',
     image: assetPath('assets/images/industries/precision-industrial.webp'),
     alt: 'Precision machined components arranged in front of a modern CNC machine',
   },

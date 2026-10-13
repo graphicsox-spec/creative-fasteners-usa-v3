@@ -1,6 +1,8 @@
 import { useEffect, useRef, useState } from 'react';
-import { heroSlides, trustItems } from '../../content/homepage';
+import { heroSlides } from '../../content/homepage';
 import { useReducedMotion } from '../../hooks/useReducedMotion';
+import { ServiceStrip } from './ServiceStrip';
+import { ClientArtworkSlide } from './ClientArtworkSlide';
 
 function ArrowIcon({ direction }: { direction: 'left' | 'right' }) {
   return (
@@ -10,115 +12,86 @@ function ArrowIcon({ direction }: { direction: 'left' | 'right' }) {
   );
 }
 
-function PlaybackIcon({ paused }: { paused: boolean }) {
-  return (
-    <svg viewBox="0 0 24 24" aria-hidden="true">
-      {paused ? <path d="M8 5v14l11-7z" /> : <path d="M6 5h3.5v14H6zm8.5 0H18v14h-3.5z" />}
-    </svg>
-  );
-}
-
 export function HeroSlider() {
   const [activeIndex, setActiveIndex] = useState(0);
-  const [trustIndex, setTrustIndex] = useState(0);
-  const [paused, setPaused] = useState(false);
-  const videoRefs = useRef<(HTMLVideoElement | null)[]>([]);
+  const touchStartX = useRef<number | null>(null);
   const reducedMotion = useReducedMotion();
   const hasMultipleSlides = heroSlides.length > 1;
-  const showVideo = !reducedMotion;
-
-  useEffect(() => {
-    const timer = setInterval(() => {
-      setTrustIndex((prev) => (prev + 1) % trustItems.length);
-    }, 3000);
-    return () => clearInterval(timer);
-  }, []);
-
-  // Play active video and smoothly pause non-active videos after cinematic crossfade
-  useEffect(() => {
-    if (!showVideo) return;
-
-    const currentVideo = videoRefs.current[activeIndex];
-    if (currentVideo) {
-      currentVideo.muted = true;
-      if (paused || document.hidden) {
-        currentVideo.pause();
-      } else {
-        currentVideo.currentTime = 0;
-        currentVideo.play().catch(() => setPaused(true));
-      }
-    }
-
-    // Keep non-active videos running during the 1.2s crossfade transition, then pause them
-    const pauseTimeout = setTimeout(() => {
-      videoRefs.current.forEach((vid, idx) => {
-        if (idx !== activeIndex && vid) {
-          vid.pause();
-        }
-      });
-    }, 1200);
-
-    return () => clearTimeout(pauseTimeout);
-  }, [activeIndex, paused, showVideo]);
-
-  // Handle visibility changes (browser tab switch)
-  useEffect(() => {
-    const handleVisibility = () => {
-      const currentVideo = videoRefs.current[activeIndex];
-      if (!currentVideo || !showVideo) return;
-      if (document.hidden) {
-        currentVideo.pause();
-      } else if (!paused) {
-        currentVideo.play().catch(() => setPaused(true));
-      }
-    };
-
-    document.addEventListener('visibilitychange', handleVisibility);
-    return () => document.removeEventListener('visibilitychange', handleVisibility);
-  }, [activeIndex, paused, showVideo]);
+  const isClientSlide = Boolean(heroSlides[activeIndex]?.clientArtwork);
 
   const moveSlide = (direction: number) => {
     setActiveIndex((current) => (current + direction + heroSlides.length) % heroSlides.length);
   };
 
-  const handleVideoEnded = () => {
-    if (hasMultipleSlides && !paused) moveSlide(1);
-  };
+  useEffect(() => {
+    if (!hasMultipleSlides || reducedMotion) return;
+
+    const timer = window.setInterval(() => {
+      setActiveIndex((current) => (current + 1) % heroSlides.length);
+    }, 6500);
+
+    return () => window.clearInterval(timer);
+  }, [activeIndex, reducedMotion, hasMultipleSlides]);
+
+  useEffect(() => {
+    const preloadTimer = window.setTimeout(() => {
+      heroSlides.slice(1).forEach((slide) => {
+        const image = new Image();
+        image.src = window.matchMedia('(max-width: 767px)').matches
+          ? slide.clientArtwork?.mobileImage ?? slide.image
+          : slide.image;
+      });
+    }, 500);
+
+    return () => window.clearTimeout(preloadTimer);
+  }, []);
 
   return (
-    <section id="home" className="hero" aria-roledescription="carousel" aria-label="Creative Fasteners USA overview">
-      <div className="hero__media" aria-hidden="true">
+    <div className="hero-slider">
+    <section
+      id="home"
+      className={`hero hero--industry ${isClientSlide ? 'hero--client-reference' : ''}`}
+      aria-roledescription="carousel"
+      aria-label="Creative Fasteners industry overview"
+      onKeyDown={(event) => {
+        if (event.key === 'ArrowLeft') moveSlide(-1);
+        if (event.key === 'ArrowRight') moveSlide(1);
+      }}
+      onTouchStart={(event) => {
+        touchStartX.current = event.touches[0]?.clientX ?? null;
+      }}
+      onTouchEnd={(event) => {
+        if (touchStartX.current === null) return;
+        const distance = event.changedTouches[0].clientX - touchStartX.current;
+        touchStartX.current = null;
+        if (Math.abs(distance) < 48) return;
+        moveSlide(distance > 0 ? -1 : 1);
+      }}
+    >
+      {isClientSlide ? <ClientArtworkSlide activeIndex={activeIndex} onSelect={setActiveIndex} /> : <>
+      <div className="hero__media">
         {heroSlides.map((slide, index) => {
           const isActive = index === activeIndex;
           return (
             <div
               key={slide.id}
               className={`hero__slide-media ${isActive ? 'is-active' : ''}`}
+              aria-hidden={!isActive}
             >
-              {showVideo ? (
-                <video
-                  ref={(el) => {
-                    videoRefs.current[index] = el;
-                  }}
-                  className="hero__video"
-                  src={slide.video}
-                  muted
-                  playsInline
-                  preload="auto"
-                  onEnded={() => {
-                    if (index === activeIndex) handleVideoEnded();
-                  }}
-                />
-              ) : (
-                <img src={slide.poster} alt="" width="1920" height="1080" />
-              )}
+              <img
+                src={slide.image}
+                alt={isActive ? slide.imageAlt : ''}
+                width="1672"
+                height="941"
+                loading={index === 0 ? 'eager' : 'lazy'}
+                fetchPriority={index === 0 ? 'high' : 'auto'}
+                style={{ objectPosition: slide.objectPosition }}
+              />
             </div>
           );
         })}
       </div>
       <div className="hero__overlay" />
-      <div className="hero__grid" aria-hidden="true" />
-      <div className="hero__side-label" aria-hidden="true">CF—USA / PRECISION MANUFACTURING</div>
 
       <div className="hero__content shell">
         {heroSlides.map((slide, index) => {
@@ -128,30 +101,17 @@ export function HeroSlider() {
               key={slide.id}
               className={`hero__copy hero__copy--${slide.id} ${isActive ? 'is-active' : ''}`}
               aria-hidden={!isActive}
-              aria-live={isActive ? 'polite' : 'off'}
+              aria-live={isActive && reducedMotion ? 'polite' : 'off'}
             >
               <p className="hero__eyebrow">
                 <span />
                 {slide.eyebrow}
               </p>
-              <h1>
-                {slide.headlineLead && slide.headlineRest ? (
-                  <>
-                    <span className="hero__headline-lead">{slide.headlineLead}</span>
-                    <span className="hero__headline-rest">{slide.headlineRest}</span>
-                    {slide.headlineFinal ? (
-                      <span className="hero__headline-final">{slide.headlineFinal}</span>
-                    ) : null}
-                  </>
-                ) : slide.headline}
-              </h1>
+              <h1>{slide.headline}</h1>
               <p className="hero__description">{slide.description}</p>
               <div className="hero__actions">
                 <a className="button button--primary" href="#rfq">
-                  Request a Quote
-                </a>
-                <a className="button button--ghost" href="#capabilities">
-                  Explore Capabilities
+                  {slide.cta}
                 </a>
               </div>
             </div>
@@ -161,62 +121,22 @@ export function HeroSlider() {
 
       <div className="hero__controls shell">
         {hasMultipleSlides ? (
-          <>
-            <div className="hero__arrows">
-              <button type="button" onClick={() => moveSlide(-1)} aria-label="Show previous hero slide">
+            <nav className="hero__navigation" aria-label="Industry slideshow controls">
+              <button type="button" onClick={() => moveSlide(-1)} aria-label="Show previous industry">
                 <ArrowIcon direction="left" />
               </button>
-              <button type="button" onClick={() => moveSlide(1)} aria-label="Show next hero slide">
+              <span className="hero__fraction" aria-label={`Slide ${activeIndex + 1} of ${heroSlides.length}`}>
+                {activeIndex + 1}/{heroSlides.length}
+              </span>
+              <button type="button" onClick={() => moveSlide(1)} aria-label="Show next industry">
                 <ArrowIcon direction="right" />
               </button>
-            </div>
-            <div className="hero__pagination" aria-label="Select hero slide">
-              {heroSlides.map((slide, index) => (
-                <button
-                  key={slide.id}
-                  type="button"
-                  className={index === activeIndex ? 'is-active' : ''}
-                  aria-label={`Show slide ${index + 1} of ${heroSlides.length}`}
-                  aria-current={index === activeIndex ? 'true' : undefined}
-                  onClick={() => setActiveIndex(index)}
-                >
-                  <span />
-                </button>
-              ))}
-            </div>
-            <div className="hero__count" aria-hidden="true">
-              <strong>{String(activeIndex + 1).padStart(2, '0')}</strong>
-              <span>/</span>
-              <span>{String(heroSlides.length).padStart(2, '0')}</span>
-            </div>
-          </>
-        ) : null}
-        {showVideo ? (
-          <button
-            className="hero__playback"
-            type="button"
-            onClick={() => setPaused((current) => !current)}
-            aria-label={paused ? 'Play background video' : 'Pause background video'}
-          >
-            <PlaybackIcon paused={paused} />
-            <span>{paused ? 'Play film' : 'Pause film'}</span>
-          </button>
+            </nav>
         ) : null}
       </div>
-
-      <div className="trust-strip" aria-label="Service principles">
-        <div className="trust-strip__inner shell">
-          {trustItems.map((item, index) => (
-            <div
-              className={`trust-strip__item ${index === trustIndex ? 'is-active' : ''}`}
-              key={item}
-            >
-              <span>{String(index + 1).padStart(2, '0')}</span>
-              <strong>{item}</strong>
-            </div>
-          ))}
-        </div>
-      </div>
+      </>}
+      <ServiceStrip />
     </section>
+    </div>
   );
 }

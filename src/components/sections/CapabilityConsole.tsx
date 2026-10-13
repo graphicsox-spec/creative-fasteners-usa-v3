@@ -1,140 +1,194 @@
-import { useState, type ReactNode } from 'react';
-import { capabilities, type CapabilityIcon as CapabilityIconName } from '../../content/homepage';
+import { useEffect, useRef, useState, type CSSProperties } from 'react';
+import { useReducedMotion } from '../../hooks/useReducedMotion';
+import coldHeadingDesktop from '../../../source-assets/process-originals/V3 Banners/01 - Cold Heading.jpg';
+import coldHeadingMobile from '../../../source-assets/process-originals/V3 Banners/01 - Cold Heading M.jpg';
+import threadRollingDesktop from '../../../source-assets/process-originals/V3 Banners/02 - Thread Rolling.jpg';
+import threadRollingMobile from '../../../source-assets/process-originals/V3 Banners/02 - Thread Rolling M.jpg';
+import secondaryOperationsDesktop from '../../../source-assets/process-originals/V3 Banners/03 - Secondary Operations.jpg';
+import secondaryOperationsMobile from '../../../source-assets/process-originals/V3 Banners/03 - Secondary Operations M.jpg';
+import checkMark from '../../../source-assets/check-mark.svg';
 
-function CapabilityIcon({ name }: { name: CapabilityIconName }) {
-  const paths: Record<CapabilityIconName, ReactNode> = {
-    forming: (
-      <>
-        <path d="M7 8h10v8H7z" />
-        <path d="M4 4h4v4M20 4h-4v4M4 20h4v-4M20 20h-4v-4" />
-      </>
-    ),
-    threading: (
-      <>
-        <path d="M5 7h14M5 11h14M5 15h14M5 19h14" />
-        <path d="M8 4v16M16 4v16" />
-      </>
-    ),
-    dies: (
-      <>
-        <rect x="3" y="3" width="18" height="18" rx="2" />
-        <circle cx="12" cy="12" r="5" />
-        <path d="M12 3v4M12 17v4M3 12h4M17 12h4" />
-      </>
-    ),
-    tooling: (
-      <>
-        <path d="M6 3h12v5H6z" />
-        <path d="M9 8v6l3 7 3-7V8" />
-        <path d="M4 21h16" />
-      </>
-    ),
-    trimming: (
-      <>
-        <path d="M4 4l16 16M4 20L20 4" />
-        <circle cx="12" cy="12" r="8" />
-      </>
-    ),
-    drilling: (
-      <>
-        <path d="M12 3v8" />
-        <path d="M8 11h8l-4 10z" />
-        <path d="M5 5h14" />
-      </>
-    ),
-    heat: (
-      <>
-        <path d="M4 3h16v18H4zM4 8h16" />
-        <path d="M7 11h10v7H7z" />
-        <path d="M9.5 16c0-1 .8-1.35.8-2.35 0-.6-.25-1.05-.55-1.45M12 16c0-1 .8-1.35.8-2.35 0-.6-.25-1.05-.55-1.45M14.5 16c0-1 .8-1.35.8-2.35 0-.6-.25-1.05-.55-1.45" />
-        <path d="M7 21v1M17 21v1M17 5.5h1" />
-      </>
-    ),
-    passivation: (
-      <>
-        <path d="M12 3l7 3v5c0 5-3 8-7 10-4-2-7-5-7-10V6z" />
-        <path d="M9 12l2 2 4-5" />
-      </>
-    ),
-    finishes: (
-      <>
-        <path d="M4 16l8-12 8 12" />
-        <path d="M6 16h12v4H6z" />
-        <path d="M9 12h6" />
-      </>
-    ),
-  };
+type Slide = {
+  id: string;
+  title: string;
+  description: string;
+  highlights: string[];
+  desktopImage: string;
+  mobileImage?: string;
+  mobileCtaTop?: string;
+};
 
-  return (
-    <svg viewBox="0 0 24 24" aria-hidden="true">
-      {paths[name]}
-    </svg>
-  );
-}
+const slides: Slide[] = [
+  {
+    id: 'cold-heading',
+    title: 'Cold Heading',
+    description: 'Progressive cold forming processes that shape solid metal into strong, dimensionally consistent precision fasteners.',
+    highlights: ['High Volume', 'Tight Tolerances', 'Stronger Components', 'Cost Effective'],
+    desktopImage: coldHeadingDesktop,
+    mobileImage: coldHeadingMobile,
+    mobileCtaTop: '89.15%',
+  },
+  {
+    id: 'thread-rolling',
+    title: 'Thread Rolling',
+    description: 'Controlled rolling and threading processes that produce accurate thread profiles, consistent pitch, and improved material strength.',
+    highlights: ['Accurate Thread Profiles', 'Consistent Pitch', 'Higher Strength', 'Wide Size Range'],
+    desktopImage: threadRollingDesktop,
+    mobileImage: threadRollingMobile,
+    mobileCtaTop: '89.15%',
+  },
+  {
+    id: 'secondary-operations',
+    title: 'Secondary Operations',
+    description: 'We offer a wide range of secondary operations including heat treating, plating, patching, black oxide, and passivation, providing additional processing to meet specific application and performance requirements. Integrated into our manufacturing process, these services help ensure our fasteners meet customer drawings, specifications, and quality standards.',
+    highlights: ['Heat Treating', 'Plating', 'Patching', 'Black Oxide', 'Passivation'],
+    desktopImage: secondaryOperationsDesktop,
+    mobileImage: secondaryOperationsMobile,
+    mobileCtaTop: '89.15%',
+  },
+];
 
 export function CapabilityConsole() {
   const [activeIndex, setActiveIndex] = useState(0);
-  const activeCapability = capabilities[activeIndex];
-  const totalCapabilities = String(capabilities.length).padStart(2, '0');
+  const [paused, setPaused] = useState(false);
+  const [isMobile, setIsMobile] = useState(() => (
+    typeof window !== 'undefined' && window.matchMedia('(max-width: 767px)').matches
+  ));
+  const touchStartX = useRef<number | null>(null);
+  const reducedMotion = useReducedMotion();
+  const activeSlides = isMobile ? slides.filter((slide) => slide.mobileImage) : slides;
+
+  const moveSlide = (direction: number) => {
+    setActiveIndex((current) => (current + direction + activeSlides.length) % activeSlides.length);
+  };
+
+  useEffect(() => {
+    const media = window.matchMedia('(max-width: 767px)');
+    const updateBreakpoint = () => setIsMobile(media.matches);
+    updateBreakpoint();
+    media.addEventListener('change', updateBreakpoint);
+    return () => media.removeEventListener('change', updateBreakpoint);
+  }, []);
+
+  useEffect(() => {
+    if (activeIndex >= activeSlides.length) setActiveIndex(0);
+  }, [activeIndex, activeSlides.length]);
+
+  useEffect(() => {
+    if (paused || reducedMotion) return;
+
+    const timer = window.setTimeout(() => {
+      setActiveIndex((current) => (current + 1) % activeSlides.length);
+    }, 7000);
+
+    return () => window.clearTimeout(timer);
+  }, [activeIndex, activeSlides.length, paused, reducedMotion]);
+
+  useEffect(() => {
+    const preloadTimer = window.setTimeout(() => {
+      slides.forEach((slide) => {
+        [slide.desktopImage, slide.mobileImage].filter(Boolean).forEach((source) => {
+          const image = new Image();
+          image.src = source as string;
+        });
+      });
+    }, 300);
+
+    return () => window.clearTimeout(preloadTimer);
+  }, []);
 
   return (
-    <div className="capability-console">
-      <div className="capability-console__rail" aria-hidden="true">
-        <span>Process selector</span>
-        <span>{totalCapabilities} capability reviews</span>
-        <span>Drawing-led evaluation</span>
+    <section
+      className="capability-carousel"
+      aria-roledescription="carousel"
+      aria-label="Manufacturing capabilities"
+      tabIndex={0}
+      onMouseEnter={() => setPaused(true)}
+      onMouseLeave={() => setPaused(false)}
+      onFocusCapture={() => setPaused(true)}
+      onBlurCapture={(event) => {
+        if (!event.currentTarget.contains(event.relatedTarget)) setPaused(false);
+      }}
+      onKeyDown={(event) => {
+        if (event.key === 'ArrowLeft') moveSlide(-1);
+        if (event.key === 'ArrowRight') moveSlide(1);
+      }}
+      onTouchStart={(event) => {
+        touchStartX.current = event.touches[0]?.clientX ?? null;
+      }}
+      onTouchEnd={(event) => {
+        if (touchStartX.current === null) return;
+        const distance = event.changedTouches[0].clientX - touchStartX.current;
+        touchStartX.current = null;
+        if (Math.abs(distance) < 48) return;
+        moveSlide(distance > 0 ? -1 : 1);
+      }}
+    >
+      <div className="capability-carousel__viewport">
+        {activeSlides.map((slide, index) => {
+          const isActive = index === activeIndex;
+          const hasMobileArtwork = Boolean(slide.mobileImage);
+
+          return (
+            <figure
+              className={`capability-carousel__slide ${isActive ? 'is-active' : ''} ${hasMobileArtwork ? '' : 'capability-carousel__slide--desktop-mobile-fallback'}`}
+              aria-hidden={!isActive}
+              key={slide.id}
+            >
+              <img
+                src={isMobile && slide.mobileImage ? slide.mobileImage : slide.desktopImage}
+                alt={`${slide.title} manufacturing capability banner`}
+                width={isMobile && slide.mobileImage ? 1080 : 1920}
+                height={isMobile && slide.mobileImage ? 1920 : 985}
+                loading={index === 0 ? 'eager' : 'lazy'}
+                fetchPriority={index === 0 ? 'high' : 'auto'}
+              />
+              <figcaption className="capability-carousel__sr-only">{slide.title}</figcaption>
+              {!isMobile ? (
+                <div className="capability-carousel__content" aria-hidden={!isActive}>
+                  <h3>{slide.title}</h3>
+                  <p>{slide.description}</p>
+                  <ul>
+                    {slide.highlights.map((highlight) => (
+                      <li key={highlight}>
+                        <img src={checkMark} alt="" aria-hidden="true" />
+                        <span>{highlight}</span>
+                      </li>
+                    ))}
+                  </ul>
+                  <a className="button button--primary capability-carousel__button" href="#rfq" tabIndex={isActive ? 0 : -1}>
+                    Request a Quote
+                  </a>
+                </div>
+              ) : hasMobileArtwork ? (
+                <a
+                  className="capability-carousel__cta"
+                  href="#rfq"
+                  aria-label={`Request a quote for ${slide.title}`}
+                  tabIndex={isActive ? 0 : -1}
+                  style={{ '--mobile-cta-top': slide.mobileCtaTop } as CSSProperties}
+                />
+              ) : null}
+            </figure>
+          );
+        })}
       </div>
 
-      <div className="capability-console__body">
-        <div className="capability-console__menu" role="tablist" aria-label="Manufacturing capabilities">
-          {capabilities.map((capability, index) => {
-            const selected = index === activeIndex;
-            return (
-              <button
-                type="button"
-                role="tab"
-                aria-selected={selected}
-                aria-controls="capability-detail"
-                className={selected ? 'is-active' : ''}
-                key={capability.number}
-                onClick={() => setActiveIndex(index)}
-                onFocus={() => setActiveIndex(index)}
-                onMouseEnter={() => setActiveIndex(index)}
-              >
-                <span>{capability.number}</span>
-                <strong>{capability.title}</strong>
-                <i aria-hidden="true">↗</i>
-              </button>
-            );
-          })}
+      <div className="capability-carousel__controls">
+        <div className="capability-carousel__progress" aria-label="Choose a manufacturing capability">
+          {activeSlides.map((slide, index) => (
+            <button
+              type="button"
+              key={slide.id}
+              aria-label={`Show ${slide.title}`}
+              aria-current={index === activeIndex ? 'true' : undefined}
+              onClick={() => setActiveIndex(index)}
+            >
+              <span />
+            </button>
+          ))}
         </div>
-
-        <article
-          className="capability-console__stage"
-          id="capability-detail"
-          role="tabpanel"
-          aria-live="polite"
-        >
-          <div className="capability-console__grid" aria-hidden="true" />
-          <div className="capability-console__stage-head">
-            <span className="capability-console__number">{activeCapability.number}<small>/{totalCapabilities}</small></span>
-            <div className="capability-console__icon">
-              <CapabilityIcon name={activeCapability.icon} />
-            </div>
-          </div>
-
-          <div className="capability-console__copy" key={activeCapability.number}>
-            <span>Selected process review</span>
-            <h3>{activeCapability.title}</h3>
-            <p>{activeCapability.description}</p>
-          </div>
-
-          <div className="capability-console__status" aria-hidden="true">
-            <span><i />Specification input required</span>
-            <strong>CF—USA / PROCESS {activeCapability.number}</strong>
-          </div>
-        </article>
       </div>
-    </div>
+    </section>
   );
 }

@@ -5,8 +5,8 @@ export function Footer() {
     <footer id="contact" className="site-footer">
       <div className="site-footer__top shell">
         <div className="site-footer__brand">
-          <a href="#home" aria-label="Creative Fasteners USA home">
-            <img src={`${import.meta.env.BASE_URL}assets/brand/logo-white.svg`} alt="Creative Fasteners USA" width="584" height="166" />
+          <a href="#home" aria-label="Creative Fasteners home">
+            <img src={`${import.meta.env.BASE_URL}assets/brand/logo-white.svg`} alt="Creative Fasteners" width="420" height="130" />
           </a>
           <p>Precision fastener manufacturing support for demanding aerospace, defense, and industrial requirements.</p>
         </div>
@@ -20,9 +20,7 @@ export function Footer() {
         </div>
         <div>
           <h2>Contact</h2>
-          <p>Sales email pending client confirmation</p>
-          <p>Phone number pending client confirmation</p>
-          <p>Location pending client confirmation</p>
+          <p>Contact details will be added after client confirmation.</p>
         </div>
         <div className="site-footer__cta">
           <span>Have a drawing or part requirement?</span>
@@ -34,7 +32,7 @@ export function Footer() {
         </div>
       </div>
       <div className="site-footer__bottom shell">
-        <span>© {new Date().getFullYear()} Creative Fasteners USA. All rights reserved.</span>
+        <span>© {new Date().getFullYear()} Creative Fasteners. All rights reserved.</span>
         <a href="#privacy-note">Privacy Policy</a>
         <span id="privacy-note">Privacy policy content pending client approval.</span>
         <a href="#home">Back to top ↑</a>

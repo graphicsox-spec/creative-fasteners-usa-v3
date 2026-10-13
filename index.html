@@ -3,23 +3,31 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="theme-color" content="#050D1B" />
+    <meta name="theme-color" content="#202B35" />
     <meta
       name="description"
-      content="Creative Fasteners USA provides cold heading, thread rolling, threading, trimming, cold heading dies, punch dies and made-to-spec precision fastener manufacturing."
+      content="Creative Fasteners provides cold heading, thread rolling, threading, trimming, cold heading dies, punch dies and made-to-spec precision fastener manufacturing."
     />
     <meta property="og:type" content="website" />
-    <meta property="og:title" content="Creative Fasteners USA | Cold Heading & Thread Rolling" />
+    <meta property="og:title" content="Creative Fasteners | Cold Heading & Thread Rolling" />
     <meta
       property="og:description"
-      content="Creative Fasteners USA provides cold heading, thread rolling, threading, trimming, cold heading dies, punch dies and made-to-spec precision fastener manufacturing."
+      content="Creative Fasteners provides cold heading, thread rolling, threading, trimming, cold heading dies, punch dies and made-to-spec precision fastener manufacturing."
     />
-    <meta property="og:image" content="%BASE_URL%assets/media/hero/precision-fasteners-poster.webp" />
+    <meta property="og:image" content="%BASE_URL%assets/images/hero-industries/firearms-v2.jpg" />
     <link rel="icon" type="image/svg+xml" href="%BASE_URL%assets/brand/favicon.svg" />
-    <title>Creative Fasteners USA | Cold Heading & Thread Rolling</title>
+    <title>Creative Fasteners | Cold Heading & Thread Rolling</title>
   </head>
   <body>
     <div id="root"></div>
+    <script>
+      if (
+        window.location.protocol === 'file:' &&
+        !/\/dist\/index\.html$/i.test(window.location.pathname)
+      ) {
+        window.location.replace(new URL('./dist/index.html', window.location.href));
+      }
+    </script>
     <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>

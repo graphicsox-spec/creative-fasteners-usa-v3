@@ -1,3 +1,4 @@
+import { useLayoutEffect, useRef, useState } from 'react';
 import { Footer } from './components/layout/Footer';
 import { Header } from './components/layout/Header';
 import { CapabilityConsole } from './components/sections/CapabilityConsole';
@@ -20,6 +21,28 @@ function CrosshairIcon() {
 }
 
 export default function App() {
+  const [introExpanded, setIntroExpanded] = useState(false);
+  const introGridRef = useRef<HTMLDivElement>(null);
+  const introExpandRef = useRef<HTMLButtonElement>(null);
+  const introCollapseRef = useRef<HTMLButtonElement>(null);
+
+  useLayoutEffect(() => {
+    const grid = introGridRef.current;
+    const copy = grid?.querySelector<HTMLElement>('.intro__copy');
+    const extra = grid?.querySelector<HTMLElement>('.intro__expanded');
+    if (!grid || !copy || !extra) return;
+
+    // Measure only the collapsed copy, even while the extra paragraph is open.
+    const sizePhoto = () => {
+      const collapsedHeight = copy.offsetHeight - (extra.hidden ? 0 : extra.offsetHeight);
+      grid.style.setProperty('--intro-image-height', `${collapsedHeight}px`);
+    };
+    const observer = new ResizeObserver(sizePhoto);
+    observer.observe(copy);
+    sizePhoto();
+    return () => observer.disconnect();
+  }, []);
+
   return (
     <>
       <a className="skip-link" href="#main-content">Skip to main content</a>
@@ -28,23 +51,65 @@ export default function App() {
         <HeroSlider />
 
         <section id="about" className="intro section">
-          <div className="shell intro__grid">
+          <div ref={introGridRef} className="shell intro__grid">
             <Reveal className="intro__copy">
               <SectionHeading
                 number="01"
-                eyebrow="Creative Fasteners USA"
-                title="Precision Components for Demanding Applications"
-                titleLines={['Precision', 'Components for', 'Demanding', 'Applications']}
+                eyebrow="Creative Fasteners"
+                title="Precision Fastener Manufacturing"
+                titleLines={['Precision Fastener', 'Manufacturing']}
               />
               <p className="intro__lead">
-                Creative Fasteners USA is built around one essential idea: demanding components require disciplined execution from the first requirement review through final release.
+                Creative Fasteners is dedicated to excellence in cold-heading manufacturing.
               </p>
               <p>
-                We focus on made-to-spec fastener manufacturing support for aerospace, defense, and precision industrial applications—bringing process routing, in-process dimensional inspection, and clear RFQ communication into one coordinated approach.
+                Our mission is to provide high-quality fasteners with unbeatable lead times, utilizing only DFAR-compliant materials. We take pride in our commitment to precision, innovation, and customer satisfaction. We welcome custom orders, embracing every opportunity to exceed expectations and drive success in partnership with our valued{' '}
+                <span className="intro__sentence-end">
+                  clients.{' '}
+                  <button
+                    ref={introExpandRef}
+                    type="button"
+                    className={`intro__toggle ${introExpanded ? 'intro__toggle--hidden' : ''}`}
+                    aria-expanded={false}
+                    aria-hidden={introExpanded ? true : undefined}
+                    disabled={introExpanded}
+                    aria-controls="intro-more-copy"
+                    onClick={() => {
+                      setIntroExpanded(true);
+                      window.requestAnimationFrame(() => introCollapseRef.current?.focus({ preventScroll: true }));
+                    }}
+                  >
+                    Read more
+                    <svg className="intro__toggle-icon" viewBox="0 0 16 16" aria-hidden="true">
+                      <path d="M4 6l4 4 4-4" />
+                    </svg>
+                  </button>
+                </span>
               </p>
-              <p>
-                Creative Fasteners USA supports precision fastener production through cold heading, thread rolling, threading, cold heading dies, punch dies, trimming and coordinated secondary operations. Every manufacturing route is reviewed against the supplied drawing, material, tolerances and intended application.
-              </p>
+              <div id="intro-more-copy" className="intro__expanded" hidden={!introExpanded}>
+                <p>
+                  All dies are manufactured in-house, allowing us to maintain precise control over tooling quality, dimensional accuracy, and production{' '}
+                  <span className="intro__sentence-end">
+                    consistency.{' '}
+                    <button
+                      ref={introCollapseRef}
+                      type="button"
+                      className="intro__toggle"
+                      aria-expanded={true}
+                      aria-controls="intro-more-copy"
+                      onClick={() => {
+                        setIntroExpanded(false);
+                        window.requestAnimationFrame(() => introExpandRef.current?.focus({ preventScroll: true }));
+                      }}
+                    >
+                      Read less
+                      <svg className="intro__toggle-icon" viewBox="0 0 16 16" aria-hidden="true">
+                        <path d="M4 10l4-4 4 4" />
+                      </svg>
+                    </button>
+                  </span>
+                </p>
+              </div>
               <a className="text-link" href="#quality">See the quality-control process <span aria-hidden="true">↗</span></a>
             </Reveal>
 
@@ -67,6 +132,35 @@ export default function App() {
               </div>
             </Reveal>
           </div>
+
+          <Reveal className="shell materials" delay={80}>
+            <div className="materials__heading">
+              <span>Materials &amp; Manufacturing Capabilities</span>
+              <h3>Material Selection</h3>
+              <p>We manufacture precision fasteners using a wide range of materials to meet specific application, engineering, and performance requirements. Our material capabilities include:</p>
+            </div>
+            <div className="materials__grid">
+              <article className="materials__card">
+                <h4>Material Capabilities</h4>
+                <ul>
+                  <li><strong>Stainless Steel:</strong> 316, 304 / 18-8, and 302</li>
+                  <li><strong>Alloy Steel:</strong> 4037 and 8740</li>
+                  <li><strong>Copper Alloys:</strong> Silicon bronze and brass</li>
+                  <li><strong>Specialty Alloys:</strong> A286, PH 13-8, Monel 400, and Inconel 718</li>
+                  <li><strong>Aluminum:</strong> 7075</li>
+                </ul>
+              </article>
+              <article className="materials__card">
+                <h4>Standard &amp; Metric Sizes</h4>
+                <p>We manufacture standard and metric fasteners in a variety of diameters and lengths to meet customer drawings and specifications.</p>
+                <ul>
+                  <li><strong>Standard Sizes:</strong> Diameters from #2-56 through 5/16&quot; and lengths from 3/16&quot; to 3-1/2&quot;.</li>
+                  <li><strong>Metric Sizes:</strong> Diameters from M2 through M8 and lengths from 4 mm to 75 mm.</li>
+                </ul>
+              </article>
+            </div>
+            <p className="materials__summary">Our material and size capabilities support a broad range of precision fastener applications across multiple industries.</p>
+          </Reveal>
         </section>
 
         <section id="capabilities" className="capabilities section section--grey">
@@ -77,15 +171,14 @@ export default function App() {
                 <SectionHeading
                   number="02"
                   eyebrow="Manufacturing Capabilities"
-                  title="Cold Heading & Thread Rolling Capabilities"
-                  description="Integrated cold heading, thread rolling, threading, trimming and secondary manufacturing processes developed around your drawing, material and performance requirements."
+                  title="Cold Heading & Thread Rolling"
+                  description="Cold Heading, Thread Rolling, and Secondary Manufacturing Processes Engineered to Meet Your Drawing Specifications, Material Requirements, and Performance Standards."
                 />
-                <p className="section-note">Capability availability, process route, material compatibility, and specification fit are confirmed during RFQ review.</p>
               </div>
             </Reveal>
-            <Reveal delay={80}>
-              <CapabilityConsole />
-            </Reveal>
+          </div>
+          <div className="capabilities__fullwidth">
+            <CapabilityConsole />
           </div>
         </section>
 
@@ -97,18 +190,12 @@ export default function App() {
                 number="03"
                 eyebrow="Quality-Control Process"
                 title="Quality Controlled at Every Stage"
-                description="Quality is treated as a connected production discipline, with review points that follow the component through the manufacturing route."
+                description="Quality is treated as a connected production discipline, with review points that follow the fastener through the manufacturing route."
                 light
               />
             </Reveal>
             <Reveal delay={100}>
               <QualityTimeline />
-            </Reveal>
-            <Reveal delay={180}>
-              <div className="quality__notice">
-                <span aria-hidden="true">!</span>
-                <p><strong>Verification note:</strong> Final compliance, certification, and quality-system language will be inserted only after supporting client documentation has been reviewed.</p>
-              </div>
             </Reveal>
           </div>
         </section>
@@ -126,9 +213,9 @@ export default function App() {
                 <a className="button button--outline-dark" href="#rfq">Discuss Your Application</a>
               </div>
             </Reveal>
-            <div className="industries__grid">
+            <div className="industries__grid" aria-label="Industries served">
               {industries.map((industry, index) => (
-                <Reveal key={industry.number} delay={index * 80}>
+                <Reveal key={industry.number} delay={index * 55}>
                   <IndustryPanel {...industry} />
                 </Reveal>
               ))}
@@ -141,7 +228,7 @@ export default function App() {
             <Reveal className="why__intro">
               <SectionHeading
                 number="05"
-                eyebrow="Why Creative Fasteners USA"
+                eyebrow="Why Creative Fasteners"
                 title="Discipline You Can Build Around"
                 description="A modern manufacturing partner should make requirements clearer, process decisions more visible, and RFQ communication easier to act on."
                 light
@@ -169,15 +256,15 @@ export default function App() {
                 <SectionHeading
                   number="06"
                   eyebrow="Request for Quote"
-                  title="Bring Us the Requirement"
-                  description="Share the information available now. Drawing details, material, finish, quantity, and timing help shape a more focused review."
+                  title="Start the Conversation"
+                  description="Share your contact information and a brief comment. Our team can follow up to discuss the details of your requirement."
                 />
                 <div className="rfq__aside">
-                  <span>RFQ REVIEW INPUTS</span>
+                  <span>WHAT HAPPENS NEXT</span>
                   <ul>
-                    <li>Drawing or part number</li>
-                    <li>Material and finish</li>
-                    <li>Quantity and required date</li>
+                    <li>Share your contact details</li>
+                    <li>Tell us what you need</li>
+                    <li>Our team follows up</li>
                   </ul>
                 </div>
               </div>
