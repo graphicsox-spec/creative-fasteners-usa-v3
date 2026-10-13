@@ -1,4 +1,4 @@
-import { useLayoutEffect, useRef, useState } from 'react';
+import { useLayoutEffect, useRef } from 'react';
 import { Footer } from './components/layout/Footer';
 import { Header } from './components/layout/Header';
 import { CapabilityConsole } from './components/sections/CapabilityConsole';
@@ -21,21 +21,15 @@ function CrosshairIcon() {
 }
 
 export default function App() {
-  const [introExpanded, setIntroExpanded] = useState(false);
   const introGridRef = useRef<HTMLDivElement>(null);
-  const introExpandRef = useRef<HTMLButtonElement>(null);
-  const introCollapseRef = useRef<HTMLButtonElement>(null);
 
   useLayoutEffect(() => {
     const grid = introGridRef.current;
     const copy = grid?.querySelector<HTMLElement>('.intro__copy');
-    const extra = grid?.querySelector<HTMLElement>('.intro__expanded');
-    if (!grid || !copy || !extra) return;
+    if (!grid || !copy) return;
 
-    // Measure only the collapsed copy, even while the extra paragraph is open.
     const sizePhoto = () => {
-      const collapsedHeight = copy.offsetHeight - (extra.hidden ? 0 : extra.offsetHeight);
-      grid.style.setProperty('--intro-image-height', `${collapsedHeight}px`);
+      grid.style.setProperty('--intro-image-height', `${copy.offsetHeight}px`);
     };
     const observer = new ResizeObserver(sizePhoto);
     observer.observe(copy);
@@ -63,53 +57,11 @@ export default function App() {
                 Creative Fasteners is dedicated to excellence in cold-heading manufacturing.
               </p>
               <p>
-                Our mission is to provide high-quality fasteners with unbeatable lead times, utilizing only DFAR-compliant materials. We take pride in our commitment to precision, innovation, and customer satisfaction. We welcome custom orders, embracing every opportunity to exceed expectations and drive success in partnership with our valued{' '}
-                <span className="intro__sentence-end">
-                  clients.{' '}
-                  <button
-                    ref={introExpandRef}
-                    type="button"
-                    className={`intro__toggle ${introExpanded ? 'intro__toggle--hidden' : ''}`}
-                    aria-expanded={false}
-                    aria-hidden={introExpanded ? true : undefined}
-                    disabled={introExpanded}
-                    aria-controls="intro-more-copy"
-                    onClick={() => {
-                      setIntroExpanded(true);
-                      window.requestAnimationFrame(() => introCollapseRef.current?.focus({ preventScroll: true }));
-                    }}
-                  >
-                    Read more
-                    <svg className="intro__toggle-icon" viewBox="0 0 16 16" aria-hidden="true">
-                      <path d="M4 6l4 4 4-4" />
-                    </svg>
-                  </button>
-                </span>
+                Our mission is to provide high-quality fasteners with unbeatable lead times, utilizing only DFAR-compliant materials. We take pride in our commitment to precision, innovation, and customer satisfaction. We welcome custom orders, embracing every opportunity to exceed expectations and drive success in partnership with our valued clients.
               </p>
-              <div id="intro-more-copy" className="intro__expanded" hidden={!introExpanded}>
-                <p>
-                  All dies are manufactured in-house, allowing us to maintain precise control over tooling quality, dimensional accuracy, and production{' '}
-                  <span className="intro__sentence-end">
-                    consistency.{' '}
-                    <button
-                      ref={introCollapseRef}
-                      type="button"
-                      className="intro__toggle"
-                      aria-expanded={true}
-                      aria-controls="intro-more-copy"
-                      onClick={() => {
-                        setIntroExpanded(false);
-                        window.requestAnimationFrame(() => introExpandRef.current?.focus({ preventScroll: true }));
-                      }}
-                    >
-                      Read less
-                      <svg className="intro__toggle-icon" viewBox="0 0 16 16" aria-hidden="true">
-                        <path d="M4 10l4-4 4 4" />
-                      </svg>
-                    </button>
-                  </span>
-                </p>
-              </div>
+              <p>
+                All dies are manufactured in-house, allowing us to maintain precise control over tooling quality, dimensional accuracy, and production consistency.
+              </p>
               <a className="text-link" href="#quality">See the quality-control process <span aria-hidden="true">↗</span></a>
             </Reveal>
 

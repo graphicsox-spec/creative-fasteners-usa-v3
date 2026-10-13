@@ -18,7 +18,7 @@ const slides: Slide[] = [
   {
     id: 'cold-heading',
     title: 'Cold Heading',
-    description: 'Progressive cold forming processes that shape solid metal into strong, dimensionally consistent precision fasteners.',
+    description: '',
     highlights: ['High Volume', 'Tight Tolerances', 'Stronger Components', 'Cost Effective'],
     desktopImage: asset('images/capability-banners/cold-heading-desktop.jpg'),
     mobileImage: asset('images/capability-banners/cold-heading-mobile.jpg'),
@@ -27,7 +27,7 @@ const slides: Slide[] = [
   {
     id: 'thread-rolling',
     title: 'Thread Rolling',
-    description: 'Controlled rolling and threading processes that produce accurate thread profiles, consistent pitch, and improved material strength.',
+    description: '',
     highlights: ['Accurate Thread Profiles', 'Consistent Pitch', 'Higher Strength', 'Wide Size Range'],
     desktopImage: asset('images/capability-banners/thread-rolling-desktop.jpg'),
     mobileImage: asset('images/capability-banners/thread-rolling-mobile.jpg'),
@@ -143,7 +143,7 @@ export function CapabilityConsole() {
               {!isMobile ? (
                 <div className="capability-carousel__content" aria-hidden={!isActive}>
                   <h3>{slide.title}</h3>
-                  <p>{slide.description}</p>
+                  {slide.description ? <p>{slide.description}</p> : null}
                   <ul>
                     {slide.highlights.map((highlight) => (
                       <li key={highlight}>
