@@ -1,12 +1,8 @@
 import { useEffect, useRef, useState, type CSSProperties } from 'react';
 import { useReducedMotion } from '../../hooks/useReducedMotion';
-import coldHeadingDesktop from '../../../source-assets/process-originals/V3 Banners/01 - Cold Heading.jpg';
-import coldHeadingMobile from '../../../source-assets/process-originals/V3 Banners/01 - Cold Heading M.jpg';
-import threadRollingDesktop from '../../../source-assets/process-originals/V3 Banners/02 - Thread Rolling.jpg';
-import threadRollingMobile from '../../../source-assets/process-originals/V3 Banners/02 - Thread Rolling M.jpg';
-import secondaryOperationsDesktop from '../../../source-assets/process-originals/V3 Banners/03 - Secondary Operations.jpg';
-import secondaryOperationsMobile from '../../../source-assets/process-originals/V3 Banners/03 - Secondary Operations M.jpg';
-import checkMark from '../../../source-assets/check-mark.svg';
+
+const asset = (path: string) => `${import.meta.env.BASE_URL}assets/${path}`;
+const checkMark = asset('brand/check-mark.svg');
 
 type Slide = {
   id: string;
@@ -24,8 +20,8 @@ const slides: Slide[] = [
     title: 'Cold Heading',
     description: 'Progressive cold forming processes that shape solid metal into strong, dimensionally consistent precision fasteners.',
     highlights: ['High Volume', 'Tight Tolerances', 'Stronger Components', 'Cost Effective'],
-    desktopImage: coldHeadingDesktop,
-    mobileImage: coldHeadingMobile,
+    desktopImage: asset('images/capability-banners/cold-heading-desktop.jpg'),
+    mobileImage: asset('images/capability-banners/cold-heading-mobile.jpg'),
     mobileCtaTop: '89.15%',
   },
   {
@@ -33,8 +29,8 @@ const slides: Slide[] = [
     title: 'Thread Rolling',
     description: 'Controlled rolling and threading processes that produce accurate thread profiles, consistent pitch, and improved material strength.',
     highlights: ['Accurate Thread Profiles', 'Consistent Pitch', 'Higher Strength', 'Wide Size Range'],
-    desktopImage: threadRollingDesktop,
-    mobileImage: threadRollingMobile,
+    desktopImage: asset('images/capability-banners/thread-rolling-desktop.jpg'),
+    mobileImage: asset('images/capability-banners/thread-rolling-mobile.jpg'),
     mobileCtaTop: '89.15%',
   },
   {
@@ -42,8 +38,8 @@ const slides: Slide[] = [
     title: 'Secondary Operations',
     description: 'We offer a wide range of secondary operations including heat treating, plating, patching, black oxide, and passivation, providing additional processing to meet specific application and performance requirements. Integrated into our manufacturing process, these services help ensure our fasteners meet customer drawings, specifications, and quality standards.',
     highlights: ['Heat Treating', 'Plating', 'Patching', 'Black Oxide', 'Passivation'],
-    desktopImage: secondaryOperationsDesktop,
-    mobileImage: secondaryOperationsMobile,
+    desktopImage: asset('images/capability-banners/secondary-operations-desktop.jpg'),
+    mobileImage: asset('images/capability-banners/secondary-operations-mobile.jpg'),
     mobileCtaTop: '89.15%',
   },
 ];
